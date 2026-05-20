@@ -1,130 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { useParams, useNavigate } from "react-router-dom";
-// import { getStudentById } from "../../services/student.api";
-
-// const StudentDetails = () => {
-//   const { id } = useParams();
-//   const navigate = useNavigate();
-
-//   const [student, setStudent] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   const fetchStudent = async () => {
-//     try {
-//       setLoading(true);
-//       const data = await getStudentById(id);
-//       setStudent(data);
-//     } catch (err) {
-//       setError("Failed to load student details");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchStudent();
-//   }, [id]);
-
-//   if (loading) {
-//     return <p className="p-4">Loading student...</p>;
-//   }
-
-//   if (error) {
-//     return <p className="p-4 text-red-600">{error}</p>;
-//   }
-
-//   if (!student) {
-//     return <p className="p-4">Student not found</p>;
-//   }
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-semibold mb-4">
-//         Student Details
-//       </h1>
-
-//       <div className="space-y-2">
-//         <p>
-//           <strong>Name:</strong> {student.name}
-//         </p>
-//         <p>
-//           <strong>Roll No:</strong> {student.rollNo}
-//         </p>
-//         <p>
-//           <strong>Course:</strong> {student.course}
-//         </p>
-//         <p>
-//           <strong>Branch:</strong> {student.branch}
-//         </p>
-//         <p>
-//           <strong>Year:</strong> {student.year}
-//         </p>
-//         <p>
-//           <strong>Section:</strong> {student.section}
-//         </p>
-//         <p>
-//           <strong>Student Phone:</strong>{" "}
-//           {student.studentPhone}
-//         </p>
-//         <p>
-//           <strong>Student Email:</strong>{" "}
-//           {student.studentEmail}
-//         </p>
-//         <p>
-//           <strong>Parent Name:</strong>{" "}
-//           {student.parentName}
-//         </p>
-//         <p>
-//           <strong>Parent Phone:</strong>{" "}
-//           {student.parentPhone}
-//         </p>
-//         <p>
-//           <strong>Parent Email:</strong>{" "}
-//           {student.parentEmail}
-//         </p>
-//         <p>
-//           <strong>Assigned Room:</strong>{" "}
-//           {student.room
-//             ? student.room.roomNumber
-//             : "Not Assigned"}
-//         </p>
-//         {/* <p>
-//           <strong>Local Guardian Name:</strong>{" "}
-//           {student.localGuardianName}
-//         </p>
-//         <p>
-//           <strong>Local Guardian Phone:</strong>{" "}
-//           {student.localGuardianPhone}  
-//         </p>
-//         <p>
-//           <strong>Local Guardian Address:</strong>{" "}
-//           {student.localGuardianAddress}
-//         </p> */}
-//       </div>
-
-//       <div className="mt-6 space-x-3">
-//         <button
-//           onClick={() =>
-//             navigate(`/admin/students/${id}/edit`)
-//           }
-//           className="px-4 py-2 bg-green-600 text-white rounded"
-//         >
-//           Edit
-//         </button>
-//         <button
-//           onClick={() => navigate("/admin/students")}
-//           className="px-4 py-2 bg-gray-500 text-white rounded"
-//         >
-//           Back
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default StudentDetails;
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getStudentById } from "../../services/student.api";
@@ -152,84 +25,113 @@ const StudentDetails = () => {
     fetchStudent();
   }, [id]);
 
-  if (loading) return <p>Loading student...</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!student) return <p>Student not found</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#030712] text-white p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-10 w-1/3 bg-white/10 rounded-xl" />
+          <div className="h-40 bg-white/10 rounded-2xl" />
+          <div className="h-40 bg-white/10 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#030712] flex items-center justify-center text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  if (!student) {
+    return (
+      <div className="min-h-screen bg-[#030712] flex items-center justify-center text-gray-400">
+        Student not found
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-700">
-        Student Details
-      </h1>
+    <div className="min-h-screen bg-[#030712] px-4 py-8 text-white md:px-8">
 
-      <div className="bg-white p-8 rounded-xl shadow-soft space-y-8">
+      {/* HEADER */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Student Details</h1>
+        <p className="text-sm text-gray-400">
+          Full profile information
+        </p>
+      </div>
 
-        {/* Student Information */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+      {/* CARD */}
+      <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 backdrop-blur-xl space-y-10">
+
+        {/* STUDENT INFO */}
+        <section>
+          <h2 className="text-lg font-semibold mb-4 text-white">
             Student Information
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <Detail label="Name" value={student.name} />
             <Detail label="Roll No" value={student.rollNo} />
             <Detail label="Course" value={student.course} />
             <Detail label="Branch" value={student.branch} />
             <Detail label="Year" value={student.year} />
             <Detail label="Section" value={student.section || "-"} />
-            <Detail label="Student Phone" value={student.studentPhone} />
-            <Detail label="Student Email" value={student.studentEmail} />
+            <Detail label="Phone" value={student.studentPhone} />
+            <Detail label="Email" value={student.studentEmail} />
           </div>
-        </div>
+        </section>
 
-        {/* Parent Information */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+        {/* PARENT INFO */}
+        <section>
+          <h2 className="text-lg font-semibold mb-4 text-white">
             Parent Information
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <Detail label="Parent Name" value={student.parentName} />
             <Detail label="Parent Phone" value={student.parentPhone} />
             <Detail label="Parent Email" value={student.parentEmail || "-"} />
           </div>
-        </div>
+        </section>
 
-        {/* Room Information */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+        {/* ROOM INFO */}
+        <section>
+          <h2 className="text-lg font-semibold mb-4 text-white">
             Room Information
           </h2>
 
-          <div className="text-sm">
-            {student.room ? (
-              <span className="px-3 py-1 text-xs bg-secondary/10 text-secondary rounded-full">
-                Room {student.room.roomNumber}
-              </span>
-            ) : (
-              <span className="px-3 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">
-                Not Assigned
-              </span>
-            )}
-          </div>
-        </div>
+          {student.room ? (
+            <span className="inline-block px-4 py-2 text-xs rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+              Room {student.room.roomNumber}
+            </span>
+          ) : (
+            <span className="inline-block px-4 py-2 text-xs rounded-full bg-white/10 text-gray-400">
+              Not Assigned
+            </span>
+          )}
+        </section>
 
-        {/* Buttons */}
-        <div className="flex gap-4 pt-6 border-t">
+        {/* ACTIONS */}
+        <div className="flex gap-3 pt-4 border-t border-white/10">
           <button
             onClick={() => navigate(`/admin/students/${id}/edit`)}
-            className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition"
+            className="rounded-xl bg-cyan-500 px-5 py-2 text-sm font-medium text-black hover:bg-cyan-400"
           >
             Edit Student
           </button>
 
           <button
             onClick={() => navigate("/admin/students")}
-            className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+            className="rounded-xl bg-white/10 px-5 py-2 text-sm text-white hover:bg-white/20"
           >
-            Back to List
+            Back
           </button>
         </div>
+
       </div>
     </div>
   );
@@ -237,13 +139,12 @@ const StudentDetails = () => {
 
 export default StudentDetails;
 
-
-/* Reusable Detail Row */
+/* Reusable Detail */
 function Detail({ label, value }) {
   return (
-    <div>
-      <p className="text-gray-500 text-xs">{label}</p>
-      <p className="font-medium text-gray-800 mt-1">{value}</p>
+    <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+      <p className="text-xs text-gray-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-white">{value}</p>
     </div>
   );
 }
