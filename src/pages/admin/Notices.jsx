@@ -1,127 +1,4 @@
-// import { useEffect, useState } from "react";
-// import api from "../../services/api";
-
-// export default function AdminNotices() {
-//   const [notices, setNotices] = useState([]);
-//   const [form, setForm] = useState({ title: "", message: "" });
-
-//   const fetchNotices = async () => {
-//     const res = await api.get("/notices");
-//     setNotices(res.data);
-//   };
-
-//   useEffect(() => {
-//     fetchNotices();
-//   }, []);
-
-//   const submitNotice = async (e) => {
-//     e.preventDefault();
-
-//     if (!form.title || !form.message) {
-//       alert("All fields required");
-//       return;
-//     }
-
-//     await api.post("/notices", form);
-//     setForm({ title: "", message: "" });
-//     fetchNotices();
-//   };
-
-//   const deleteNotice = async (id) => {
-//     await api.delete(`/notices/${id}`);
-//     fetchNotices();
-//   };
-
-//   return (
-//     <div>
-//       <h1 className="text-2xl font-bold text-orange-500 mb-6">
-//         Notices
-//       </h1>
-
-//       <form
-//         onSubmit={submitNotice}
-//         className="bg-white p-4 rounded shadow mb-6 space-y-3"
-//       >
-//         <input
-//           type="text"
-//           placeholder="Title"
-//           value={form.title}
-//           onChange={(e) =>
-//             setForm({ ...form, title: e.target.value })
-//           }
-//           className="w-full border px-3 py-2 rounded"
-//         />
-
-//         <textarea
-//           placeholder="Message"
-//           value={form.message}
-//           onChange={(e) =>
-//             setForm({ ...form, message: e.target.value })
-//           }
-//           className="w-full border px-3 py-2 rounded"
-//         />
-
-//         <button className="bg-green-600 text-white px-4 py-2 rounded">
-//           Post Notice
-//         </button>
-//       </form>
-
-//       <div className="space-y-4">
-//         {notices.map((n) => (
-//           <div
-//             key={n._id}
-//             className="bg-white p-4 rounded border"
-//           >
-//             <h3 className="font-semibold">{n.title}</h3>
-//             <p className="text-sm">{n.message}</p>
-//             <button
-//               onClick={() => deleteNotice(n._id)}
-//               className="text-red-600 text-xs mt-2"
-//             >
-//               Delete
-//             </button>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-// import { useEffect, useState } from "react";
-// import api from "../../services/api";
-
-// export default function AdminNotices() {
-//   const [notices, setNotices] = useState([]);
-//   const [form, setForm] = useState({ title: "", message: "" });
-
-//   const fetchNotices = async () => {
-//     const res = await api.get("/notices");
-//     setNotices(res.data);
-//   };
-
-//   useEffect(() => {
-//     fetchNotices();
-//   }, []);
-
-//   const submitNotice = async (e) => {
-//     e.preventDefault();
-
-//     if (!form.title || !form.message) {
-//       alert("All fields required");
-//       return;
-//     }
-
-//     await api.post("/notices", form);
-//     setForm({ title: "", message: "" });
-//     fetchNotices();
-//   };
-
-//   const deleteNotice = async (id) => {
-//     await api.delete(`/notices/${id}`);
-//     fetchNotices();
-//   };
-
-  import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../services/api";
 
 export default function AdminNotices() {
@@ -156,19 +33,27 @@ export default function AdminNotices() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <h1 className="text-2xl font-semibold text-gray-700">
-        Notice Management
-      </h1>
+    <div className="min-h-screen bg-[#070B14] px-4 py-6 space-y-6 text-white">
 
-      {/* Create Notice Card */}
-      <div className="bg-white p-6 rounded-xl shadow-soft">
-        <h2 className="text-lg font-semibold mb-4 text-gray-700">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-white">
+          Notice Management
+        </h1>
+        <p className="text-sm text-white/50 mt-1">
+          Create and manage hostel announcements
+        </p>
+      </div>
+
+      {/* Create Notice */}
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+
+        <h2 className="text-lg font-semibold mb-4 text-white">
           Post New Notice
         </h2>
 
         <form onSubmit={submitNotice} className="space-y-4">
+
           <input
             type="text"
             placeholder="Notice Title"
@@ -176,7 +61,7 @@ export default function AdminNotices() {
             onChange={(e) =>
               setForm({ ...form, title: e.target.value })
             }
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-cyan-400/40"
           />
 
           <textarea
@@ -186,12 +71,12 @@ export default function AdminNotices() {
               setForm({ ...form, message: e.target.value })
             }
             rows="4"
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 outline-none focus:border-cyan-400/40"
           />
 
           <button
             type="submit"
-            className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-primary/90 transition"
+            className="rounded-xl bg-cyan-500 px-5 py-2 font-semibold text-black hover:bg-cyan-400 transition"
           >
             Post Notice
           </button>
@@ -200,31 +85,35 @@ export default function AdminNotices() {
 
       {/* Notices Grid */}
       {notices.length === 0 ? (
-        <div className="bg-white p-8 rounded-xl shadow-soft text-center text-gray-400">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white/60">
           No notices available
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
           {notices.map((n) => (
             <div
               key={n._id}
-              className="bg-white p-6 rounded-xl shadow-soft hover:shadow-lg transition flex flex-col justify-between"
+              className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl hover:border-cyan-400/30 transition flex flex-col justify-between"
             >
+
               <div>
-                <h3 className="font-semibold text-lg text-gray-800">
+                <h3 className="text-lg font-semibold text-white">
                   {n.title}
                 </h3>
-                <p className="text-sm text-gray-600 mt-3">
+
+                <p className="text-sm text-white/60 mt-3">
                   {n.message}
                 </p>
               </div>
 
               <button
                 onClick={() => deleteNotice(n._id)}
-                className="mt-6 text-sm text-red-600 hover:text-red-700 font-medium"
+                className="mt-6 text-sm font-medium text-red-400 hover:text-red-300 transition"
               >
                 Delete Notice
               </button>
+
             </div>
           ))}
         </div>

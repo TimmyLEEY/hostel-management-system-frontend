@@ -3,38 +3,54 @@ import { Outlet } from "react-router-dom";
 
 export default function AdminLayout() {
   return (
-    <div className="min-h-screen bg-lightBg flex flex-col">
+    <div className="min-h-screen bg-[#0a0f1c] text-white flex">
 
-      {/* ✅ TOP NAVBAR */}
+      {/* SIDEBAR */}
       <Sidebar role="ADMIN" />
 
-      {/* ✅ PAGE CONTENT */}
-      <main className="flex-1 pt-16 sm:pt-20 px-4 sm:px-6">
+      {/* MAIN AREA */}
+      <div className="flex flex-1 flex-col">
 
-        {/* Header Section */}
-        <div className="h-14 sm:h-16 bg-white shadow-soft rounded-xl flex items-center justify-between px-4 sm:px-6 mb-6">
+        {/* TOP BAR */}
+        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0a0f1c]/80 backdrop-blur-xl">
 
-          <h1 className="text-sm sm:text-lg font-semibold text-gray-700">
-            Admin Dashboard
-          </h1>
+          <div className="flex h-16 items-center justify-between px-6">
 
-          <div className="flex items-center gap-3 sm:gap-4">
+            {/* LEFT */}
+            <div>
+              <h1 className="text-sm font-medium text-white">
+                Admin Dashboard
+              </h1>
+              <p className="text-xs text-gray-400">
+                Hostel Management System
+              </p>
+            </div>
 
-            <span className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold bg-primary/10 text-primary rounded-full">
-              ADMIN
-            </span>
+            {/* RIGHT */}
+            <div className="flex items-center gap-3">
 
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-sm">
-              A
+              <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
+                ADMIN
+              </span>
+
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 font-bold text-white">
+                A
+              </div>
+
             </div>
 
           </div>
-        </div>
 
-        {/* Nested Pages */}
-        <Outlet />
+        </header>
 
-      </main>
+        {/* PAGE CONTENT */}
+        <main className="flex-1 bg-[#0a0f1c] px-6 py-6">
+
+          <Outlet />
+
+        </main>
+
+      </div>
     </div>
   );
 }

@@ -1,213 +1,97 @@
-// import { useEffect, useState } from "react";
-// import api from "../../services/api";
-
-// export default function AdminPermissions() {
-//   const [permissions, setPermissions] = useState([]);
-
-//   const fetchPermissions = async () => {
-//     const res = await api.get("/permissions");
-//     setPermissions(res.data);
-//   };
-
-//   useEffect(() => {
-//     fetchPermissions();
-//   }, []);
-
-//   const updateStatus = async (id, status) => {
-//     await api.put(`/permissions/${id}/status`, { status });
-//     fetchPermissions();
-//   };
-
-//   return (
-//     <div>
-//       <h1 className="text-2xl font-bold mb-4">Outing Requests</h1>
-
-//       {permissions.map((p) => (
-//         <div key={p._id} className="border p-3 mb-3">
-//           <p><b>Student:</b> {p.student?.name}</p>
-//           <p><b>Reason:</b> {p.reason}</p>
-// <p className="text-sm mt-2">
-//   Parent:{" "}
-//   <span className="font-semibold">
-//     {p.parentAcknowledged ? "Seen" : "Not Seen"}
-//   </span>{" "}
-//   | Admin:{" "}
-//   <span
-//     className={`font-semibold ${
-//       p.adminStatus === "APPROVED"
-//         ? "text-green-600"
-//         : p.adminStatus === "REJECTED"
-//         ? "text-red-600"
-//         : "text-yellow-600"
-//     }`}
-//   >
-//     {p.adminStatus}
-//   </span>
-// </p>
-//           {p.adminStatus === "PENDING" ? (
-//   <>
-//     <button
-//       onClick={() => updateStatus(p._id, "APPROVED")}
-//       className="bg-green-500 text-white px-3 py-1 mr-2"
-//     >
-//       Approve
-//     </button>
-//     <button
-//       onClick={() => updateStatus(p._id, "REJECTED")}
-//       className="bg-red-500 text-white px-3 py-1"
-//     >
-//       Reject
-//     </button>
-//   </>
-// ) : (
-//   <span className="font-semibold text-gray-600">
-//     Decision Locked
-//   </span>
-// )}
-
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
-
-
-// import { useEffect, useState } from "react";
-// import api from "../../services/api";
-
-// export default function AdminPermissions() {
-//   const [permissions, setPermissions] = useState([]);
-
-//   const fetchPermissions = async () => {
-//     const res = await api.get("/permissions");
-//     setPermissions(res.data);
-//   };
-
-//   useEffect(() => {
-//     fetchPermissions();
-//   }, []);
-
-//   const updateStatus = async (id, status) => {
-//     await api.put(`/permissions/${id}/status`, { status });
-//     fetchPermissions();
-//   };
-
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-export default function AdminPermissions() {
-  const [permissions, setPermissions] = useState([]);
+export default function AdminComplaints() {
+  const [complaints, setComplaints] = useState([]);
 
-  const fetchPermissions = async () => {
-    const res = await api.get("/permissions");
-    setPermissions(res.data);
+  const fetchComplaints = async () => {
+    const res = await api.get("/complaints");
+    setComplaints(res.data);
   };
 
   useEffect(() => {
-    fetchPermissions();
+    fetchComplaints();
   }, []);
 
-  const updateStatus = async (id, status) => {
-    await api.put(`/permissions/${id}/status`, { status });
-    fetchPermissions();
+  const resolveComplaint = async (id) => {
+    const remark = prompt("Enter admin remark:");
+    if (!remark) return;
+
+    await api.put(`/complaints/${id}/resolve`, {
+      adminRemark: remark,
+    });
+
+    fetchComplaints();
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-700">
-        Outing Requests
-      </h1>
+    <div className="min-h-screen bg-[#070B14] px-4 py-6 space-y-6 text-white">
 
-      {permissions.length === 0 ? (
-        <div className="bg-white p-8 rounded-xl shadow-soft text-center text-gray-400">
-          No outing requests found
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-white">
+          Student Complaints
+        </h1>
+        <p className="text-sm text-white/50 mt-1">
+          Track and resolve student issues
+        </p>
+      </div>
+
+      {/* Empty State */}
+      {complaints.length === 0 ? (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white/60 backdrop-blur-xl">
+          No complaints found
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {permissions.map((p) => (
+
+          {complaints.map((c) => (
             <div
-              key={p._id}
-              className="bg-white p-6 rounded-xl shadow-soft hover:shadow-lg transition"
+              key={c._id}
+              className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl shadow-lg hover:border-cyan-400/30 transition"
             >
-              {/* Student */}
-              <h3 className="text-lg font-semibold text-gray-800">
-                {p.student?.name}
+
+              {/* Title */}
+              <h3 className="text-lg font-semibold text-white">
+                {c.title}
               </h3>
 
-              <p className="text-sm text-gray-600 mt-2">
-                {p.reason}
+              {/* Description */}
+              <p className="text-sm text-white/60 mt-2 line-clamp-3">
+                {c.description}
               </p>
 
-              {/* Status Section */}
-              <div className="mt-4 space-y-2">
+              {/* Student */}
+              <p className="text-xs text-white/40 mt-3">
+                Student:{" "}
+                <span className="text-white/80">
+                  {c.student?.name}
+                </span>
+              </p>
 
-                {/* Parent Status */}
-                <div>
-                  <span className="text-xs text-gray-500">
-                    Parent:
-                  </span>{" "}
-                  {p.parentAcknowledged ? (
-                    <span className="px-3 py-1 text-xs bg-secondary/10 text-secondary rounded-full">
-                      Seen
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">
-                      Not Seen
-                    </span>
-                  )}
-                </div>
-
-                {/* Admin Status */}
-                <div>
-                  <span className="text-xs text-gray-500">
-                    Admin:
-                  </span>{" "}
-                  {p.adminStatus === "APPROVED" && (
-                    <span className="px-3 py-1 text-xs bg-secondary/10 text-secondary rounded-full">
-                      Approved
-                    </span>
-                  )}
-                  {p.adminStatus === "REJECTED" && (
-                    <span className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded-full">
-                      Rejected
-                    </span>
-                  )}
-                  {p.adminStatus === "PENDING" && (
-                    <span className="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">
-                      Pending
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="mt-5">
-                {p.adminStatus === "PENDING" ? (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() =>
-                        updateStatus(p._id, "APPROVED")
-                      }
-                      className="flex-1 bg-secondary text-white py-2 rounded-lg hover:bg-secondary/90 transition text-sm"
-                    >
-                      Approve
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        updateStatus(p._id, "REJECTED")
-                      }
-                      className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition text-sm"
-                    >
-                      Reject
-                    </button>
-                  </div>
+              {/* Status */}
+              <div className="mt-4">
+                {c.status === "RESOLVED" ? (
+                  <span className="px-3 py-1 text-xs rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    Resolved
+                  </span>
                 ) : (
-                  <div className="text-sm text-gray-500 font-medium text-center">
-                    Decision Locked
-                  </div>
+                  <span className="px-3 py-1 text-xs rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                    Pending
+                  </span>
                 )}
               </div>
+
+              {/* Action */}
+              {c.status === "PENDING" && (
+                <button
+                  onClick={() => resolveComplaint(c._id)}
+                  className="mt-5 w-full rounded-xl bg-cyan-500/90 hover:bg-cyan-400 text-black font-semibold py-2 transition"
+                >
+                  Resolve Complaint
+                </button>
+              )}
+
             </div>
           ))}
         </div>

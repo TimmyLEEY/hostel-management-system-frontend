@@ -1,303 +1,224 @@
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import api from "../../services/axios";
-
-// const Students = () => {
-//   const navigate = useNavigate();
-
-//   const [students, setStudents] = useState([]);
-//   const [rooms, setRooms] = useState([]);
-
-//   const fetchStudents = async () => {
-//     const res = await api.get("/admin/students");
-//     setStudents(res.data);
-//   };
-
-//   const fetchRooms = async () => {
-//     const res = await api.get("/rooms");
-//     setRooms(res.data);
-//   };
-
-//   useEffect(() => {
-//     fetchStudents();
-//     fetchRooms();
-//   }, []);
-
-//   const handleAssignRoom = async (studentId, roomId) => {
-//     try {
-//       await api.put(`/admin/students/${studentId}/assign-room`, {
-//         roomId,
-//       });
-//       alert("Room assigned successfully");
-//       fetchStudents();
-//       fetchRooms();
-//     } catch (error) {
-//       alert(
-//         error?.response?.data?.message ||
-//           "Failed to assign room"
-//       );
-//     }
-//   };
-
-//   return (
-//     <div className="p-6">
-//       {/* Header */}
-//       <div className="flex justify-between items-center mb-4">
-//         <h1 className="text-2xl font-semibold">Students</h1>
-//         <button
-//           onClick={() => navigate("/admin/students/add")}
-//           className="px-4 py-2 bg-green-600 text-white rounded"
-//         >
-//           + Add Student
-//         </button>
-//       </div>
-
-//       {/* Students Table */}
-//       <table className="w-full border">
-//         <thead className="bg-gray-100">
-//           <tr>
-//             <th className="border p-2">Roll No</th>
-//             <th className="border p-2">Name</th>
-//             <th className="border p-2">Year</th>
-//             <th className="border p-2">Branch</th>
-//             <th className="border p-2">Room</th>
-//             <th className="border p-2">Assign / Change Room</th>
-//             <th className="border p-2">Actions</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {students.map((s) => (
-//             <tr key={s._id}>
-//               <td className="border p-2">{s.rollNo}</td>
-//               <td className="border p-2">{s.name}</td>
-//               <td className="border p-2">{s.year}</td>
-//               <td className="border p-2">{s.branch}</td>
-
-//               {/* Current Room */}
-//               <td className="border p-2">
-//                 {s.room
-//                   ? `${s.room.roomNumber}`
-//                   : "Not Assigned"}
-//               </td>
-
-//               {/* Assign Room */}
-//               <td className="border p-2">
-//                 <select
-//                   className="border p-1"
-//                   onChange={(e) =>
-//                     handleAssignRoom(s._id, e.target.value)
-//                   }
-//                   defaultValue=""
-//                 >
-//                   <option value="" disabled>
-//                     Select Room
-//                   </option>
-//                   {rooms.map((room) => (
-//                     <option key={room._id} value={room._id}>
-//                       {room.roomNumber}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </td>
-
-//               {/* Actions */}
-//               <td className="border p-2 space-x-2">
-//                 <button
-//                   onClick={() =>
-//                     navigate(`/admin/students/${s._id}`)
-//                   }
-//                   className="text-blue-600"
-//                 >
-//                   View
-//                 </button>
-//                 <button
-//                   onClick={() =>
-//                     navigate(`/admin/students/${s._id}/edit`)
-//                   }
-//                   className="text-green-600"
-//                 >
-//                   Edit
-//                 </button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default Students;
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/axios";
 
-const Students = () => {
+export default function Students() {
   const navigate = useNavigate();
 
   const [students, setStudents] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [search, setSearch] = useState("");
-
-  const fetchStudents = async () => {
-    const res = await api.get("/admin/students");
-    setStudents(res.data);
-  };
-
-  const fetchRooms = async () => {
-    const res = await api.get("/rooms");
-    setRooms(res.data);
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStudents();
-    fetchRooms();
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const [studentsRes, roomsRes] = await Promise.all([
+        api.get("/admin/students"),
+        api.get("/rooms"),
+      ]);
+
+      setStudents(studentsRes.data);
+      setRooms(roomsRes.data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAssignRoom = async (studentId, roomId) => {
     try {
       await api.put(`/admin/students/${studentId}/assign-room`, {
         roomId,
       });
-      fetchStudents();
-      fetchRooms();
+      fetchData();
     } catch (error) {
-      alert(
-        error?.response?.data?.message ||
-          "Failed to assign room"
-      );
+      alert(error?.response?.data?.message || "Failed to assign room");
     }
   };
 
   const filteredStudents = students.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.rollNo.toLowerCase().includes(search.toLowerCase())
+    `${s.name} ${s.rollNo}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-gray-100">
 
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-700">
-          Students Management
-        </h1>
+      {/* HEADER */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div>
+          <h1 className="text-2xl font-semibold text-white">
+            Students Management
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">
+            Manage students, assign rooms, and track records
+          </p>
+        </div>
 
         <button
           onClick={() => navigate("/admin/students/add")}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+          className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500"
         >
           + Add Student
         </button>
+
       </div>
 
-      {/* Search */}
-      <div className="bg-white p-4 rounded-xl shadow-soft">
+      {/* SEARCH */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
         <input
           type="text"
           placeholder="Search by name or roll number..."
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-gray-500"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Table Card */}
-      <div className="bg-white rounded-xl shadow-soft overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-600">
-            <tr>
-              <th className="px-4 py-3 text-left">Roll No</th>
-              <th className="px-4 py-3 text-left">Name</th>
-              <th className="px-4 py-3 text-left">Year</th>
-              <th className="px-4 py-3 text-left">Branch</th>
-              <th className="px-4 py-3 text-left">Room</th>
-              <th className="px-4 py-3 text-left">Assign Room</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
+      {/* TABLE WRAPPER */}
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220]">
 
-          <tbody>
-            {filteredStudents.length === 0 ? (
+        <div className="max-h-[70vh] overflow-auto">
+
+          <table className="w-full text-sm">
+
+            {/* HEADER */}
+            <thead className="sticky top-0 z-10 bg-[#111827] text-left text-xs uppercase tracking-wider text-gray-400">
               <tr>
-                <td colSpan="7" className="text-center py-8 text-gray-400">
-                  No students found
-                </td>
+                <th className="px-4 py-4">Roll No</th>
+                <th className="px-4 py-4">Name</th>
+                <th className="px-4 py-4">Year</th>
+                <th className="px-4 py-4">Branch</th>
+                <th className="px-4 py-4">Room</th>
+                <th className="px-4 py-4">Assign</th>
+                <th className="px-4 py-4">Actions</th>
               </tr>
-            ) : (
-              filteredStudents.map((s) => (
-                <tr
-                  key={s._id}
-                  className="border-t hover:bg-gray-50 transition"
-                >
-                  <td className="px-4 py-3">{s.rollNo}</td>
-                  <td className="px-4 py-3 font-medium text-gray-700">
-                    {s.name}
-                  </td>
-                  <td className="px-4 py-3">{s.year}</td>
-                  <td className="px-4 py-3">{s.branch}</td>
+            </thead>
 
-                  {/* Room Badge */}
-                  <td className="px-4 py-3">
-                    {s.room ? (
-                      <span className="px-3 py-1 text-xs bg-secondary/10 text-secondary rounded-full">
-                        {s.room.roomNumber}
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">
-                        Not Assigned
-                      </span>
-                    )}
-                  </td>
+            <tbody className="divide-y divide-white/5">
 
-                  {/* Assign Room */}
-                  <td className="px-4 py-3">
-                    <select
-                      className="border rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      onChange={(e) =>
-                        handleAssignRoom(s._id, e.target.value)
-                      }
-                      defaultValue=""
-                    >
-                      <option value="" disabled>
-                        Select Room
-                      </option>
-                      {rooms.map((room) => (
-                        <option key={room._id} value={room._id}>
-                          {room.roomNumber}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-4 py-3 space-x-3">
-                    <button
-                      onClick={() =>
-                        navigate(`/admin/students/${s._id}`)
-                      }
-                      className="text-primary hover:underline"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() =>
-                        navigate(`/admin/students/${s._id}/edit`)
-                      }
-                      className="text-green-600 hover:underline"
-                    >
-                      Edit
-                    </button>
+              {loading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan="7" className="px-4 py-4">
+                      <div className="h-5 w-full animate-pulse rounded bg-white/5" />
+                    </td>
+                  </tr>
+                ))
+              ) : filteredStudents.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="py-10 text-center text-gray-500">
+                    No students found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredStudents.map((s, index) => (
+                  <tr
+                    key={s._id}
+                    className={`transition ${
+                      index % 2 === 0 ? "bg-[#0b1220]" : "bg-[#0f172a]"
+                    } hover:bg-[#1f2937]`}
+                  >
+
+                    {/* ROLL */}
+                    <td className="px-4 py-4 text-gray-300">
+                      {s.rollNo}
+                    </td>
+
+                    {/* NAME */}
+                    <td className="px-4 py-4 font-medium text-white">
+                      {s.name}
+                    </td>
+
+                    {/* YEAR */}
+                    <td className="px-4 py-4">
+                      <span className="rounded-md bg-purple-500/10 px-2 py-1 text-xs text-purple-300">
+                        Year {s.year}
+                      </span>
+                    </td>
+
+                    {/* BRANCH */}
+                    <td className="px-4 py-4">
+                      <span className="rounded-md bg-pink-500/10 px-2 py-1 text-xs text-pink-300">
+                        {s.branch}
+                      </span>
+                    </td>
+
+                    {/* ROOM */}
+                    <td className="px-4 py-4">
+                      {s.room ? (
+                        <span className="rounded-md bg-green-500/10 px-2 py-1 text-xs text-green-300">
+                          Room {s.room.roomNumber}
+                        </span>
+                      ) : (
+                        <span className="rounded-md bg-gray-500/10 px-2 py-1 text-xs text-gray-400">
+                          Not assigned
+                        </span>
+                      )}
+                    </td>
+
+                    {/* ASSIGN */}
+                    <td className="px-4 py-4">
+                      <select
+                        className="rounded-lg border border-white/10 bg-[#111827] px-3 py-2 text-sm text-white outline-none focus:border-blue-500"
+                        onChange={(e) =>
+                          handleAssignRoom(s._id, e.target.value)
+                        }
+                        defaultValue=""
+                      >
+                        <option value="" disabled>
+                          Select room
+                        </option>
+                        {rooms.map((room) => (
+                          <option key={room._id} value={room._id}>
+                            {room.roomNumber}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-4 py-4">
+                      <div className="flex gap-4 text-sm">
+
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/students/${s._id}`)
+                          }
+                          className="text-blue-400 hover:text-blue-300"
+                        >
+                          View
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/students/${s._id}/edit`)
+                          }
+                          className="text-green-400 hover:text-green-300"
+                        >
+                          Edit
+                        </button>
+
+                      </div>
+                    </td>
+
+                  </tr>
+                ))
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
       </div>
     </div>
   );
-};
-
-export default Students;
+}
