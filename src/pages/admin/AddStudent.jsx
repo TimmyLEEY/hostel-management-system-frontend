@@ -31,7 +31,7 @@ const AddStudent = () => {
     try {
       setLoading(true);
 
-      await api.post("http://localhost:5000/api/admin/students", {
+      await api.post("https://hostel-management-system-backend-9ar8.onrender.com/api/admin/students", {
         ...form,
         year: Number(form.year),
       });
